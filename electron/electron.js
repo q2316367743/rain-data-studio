@@ -1,6 +1,6 @@
 // electron/electron.js
 const path = require('path');
-const {app, BrowserWindow, Menu} = require('electron');
+const { app, BrowserWindow, Menu } = require('electron');
 
 const isDev = process.env.IS_DEV === "true";
 process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true';
@@ -16,6 +16,7 @@ function createWindow() {
         height: 710,
         minWidth: 1210,
         minHeight: 710,
+        frame: false,  // 去掉默认的标题栏
         webPreferences: {
             nodeIntegration: true,
             // 官网似乎说是默认false，但是这里必须设置contextIsolation
