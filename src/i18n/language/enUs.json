@@ -1,0 +1,216 @@
+{
+    "app": {
+        "chinese": "中文",
+        "english": "English",
+        "only_build": "Only build",
+        "only_deploy": "Only the deployment",
+        "open_browser": "Open a browser",
+        "open_dev_tools": "Open Developer Tools",
+        "open_dist": "Open the deployment directory.",
+        "open_project_dir": "Open the project directory",
+        "project_name": "云落blog",
+        "server_run": "Service running",
+        "server_standby": "Service not started",
+        "server_start": "Starting the Server",
+        "server_stop": "Stopping the Server",
+        "server_unknown": "Service status unknown",
+        "server_update": "Service update in progress",
+        "server_update_now": "Update now",
+        "switch_workspace": "switch workspace",
+        "sync_fail": "synchronization failure",
+        "sync_success": "synchronous success"
+    },
+    "category": {
+        "add_category": "The new classification",
+        "add_category_hint": "Please enter a category name",
+        "add_sub_category": "Adding subcategories",
+        "delete_category_hint": "This operation will delete this category forever. Do you want to continue?",
+        "title": "category"
+    },
+    "common": {
+        "add": "add",
+        "add_by_layout": "Add according to the layout",
+        "cancel": "cancel",
+        "confirm": "confirm",
+        "dark": "dark",
+        "delete": "delete",
+        "fail": "fail",
+        "install": "install",
+        "light": "light",
+        "new": "new",
+        "refresh": "refresh",
+        "save": "save",
+        "search": "search",
+        "setting": "setting",
+        "sort": "sort",
+        "status": "status",
+        "success": "success",
+        "synchronous": "synchronous",
+        "terminal": "terminal",
+        "update": "update",
+        "warning": "warning"
+    },
+    "config": {
+        "hexo": {
+            "directory": {
+                "archive_dir": "archive_dir",
+                "category_dir": "category_dir",
+                "code_dir": "code_dir",
+                "i18n_dir": "i18n_dir",
+                "public_dir": "public_dir",
+                "skip_render": "skip_render",
+                "source_dir": "source_dir",
+                "tag_dir": "tag_dir",
+                "title": "directory"
+            },
+            "extra": {
+                "title": "codeextra"
+            },
+            "misc": {
+                "category_and_tag": {
+                    "category_map": "category_map",
+                    "default_category": "default category",
+                    "tag_map": "tag_map",
+                    "title": "category & tag"
+                },
+                "date_format": {
+                    "date_format": "date_format",
+                    "time_format": "time_format",
+                    "title": "Date/time format",
+                    "updated_option": {
+                        "date": "date",
+                        "empty": "empty",
+                        "mtime": "mtime",
+                        "title": "updated_option"
+                    }
+                },
+                "title": "misc"
+            },
+            "other": {
+                "theme": "theme",
+                "title": "other"
+            },
+            "pagination": {
+                "pagination_dir": "pagination_dir",
+                "per_page": "per_page",
+                "title": "pagination"
+            },
+            "site": {
+                "author": "author",
+                "description": "description",
+                "keywords": "keywords",
+                "language": "language",
+                "new_keyword": "The new keyword",
+                "subtitle": "subtitle",
+                "timezone": "timezone",
+                "title": "title"
+            },
+            "theme": {
+                "title": "theme"
+            },
+            "url": {
+                "permalink": "permalink",
+                "permalink_defaults": "permalink defaults",
+                "placeholder": {
+                    "permalink": "Permalink format for articles",
+                    "permalink_defaults": "Default values for each part of the permalink",
+                    "root": "Site root Directory",
+                    "url": "The web address must begin with http:// or https://"
+                },
+                "require": "url => URL is require",
+                "root": "root",
+                "title": "url",
+                "trailing_html": "Retention index.html",
+                "trailing_index": "Retention .html",
+                "url": "URL"
+            },
+            "writing": {
+                "auto_spacing": "auto_spacing",
+                "default_layout": "default_layout",
+                "external_link": {
+                    "enable": "The new TAB opens the link",
+                    "field": "Effective range",
+                    "post": "post",
+                    "site": "site"
+                },
+                "filename_case": {
+                    "lowercase": "lowercase",
+                    "no": "Don't convert",
+                    "title": "File name conversion",
+                    "uppercase": "uppercase"
+                },
+                "future": "Displays future articles",
+                "new_post_name": "new_post_name",
+                "post_asset_folder": "Enable the Asset folder",
+                "relative_link": "Relative address",
+                "render_drafts": "According to the draft",
+                "title": "writing",
+                "titlecase": "titlecase"
+            }
+        }
+    },
+    "hint": {
+        "add_fail": "The new failure",
+        "add_success": "New success",
+        "blog_not_init": "The blog has not been initialized. Please initialize and try again",
+        "delete_cancel": "Delete the cancelled",
+        "delete_fail": "Delete failed",
+        "delete_success": "Delete the success",
+        "new_fail": "new fail",
+        "new_success": "new success",
+        "open_success": "Open the success",
+        "save_fail": "Save failed",
+        "save_success": "Save success",
+        "theme_save_fail": "Failed to save the theme",
+        "theme_save_success": "Theme saved successfully",
+        "update_fail": "Modify the failure",
+        "update_success": "Modify the success"
+    },
+    "menu": {
+        "blog_setting": "blog setting",
+        "category": "category",
+        "page": "page",
+        "post": "post",
+        "pretty": "pretty",
+        "tag": "tag",
+        "tool": "tool"
+    },
+    "placeholder": {
+        "category": "Please select category",
+        "tag": "Please select tag"
+    },
+    "post": {
+        "list": {
+            "basic": "basic",
+            "createTime": "Creation time",
+            "deletePageHint": "Confirm to delete this page. It cannot be restored after being deleted",
+            "deletePostHint": "Confirm to delete this article. It cannot be restored",
+            "draft": "draft",
+            "extraAttr": "Additional attributes",
+            "newPost": "New post",
+            "notPostHint": "The article does not exist, please refresh and try again",
+            "postSetting": "post setting",
+            "postTitle": "post title",
+            "postUrl": "post url",
+            "recycle": "recycle",
+            "release": "release",
+            "searchPage": "search page",
+            "searchPost": "search post",
+            "senior": "senior",
+            "sortCreateAsc": "create(new-old)",
+            "sortCreateDesc": "create(old-new)",
+            "sortTitleAsc": "title(a-z)",
+            "sortTitleDesc": "title(z-a)",
+            "sortUpdateAsc": "update(new-old)",
+            "sortUpdateDesc": "update(old-new)"
+        }
+    },
+    "tag": {
+        "add_tag": "The new labels",
+        "add_tag_hint": "Please enter the label name",
+        "delete_hint": "This action will permanently remove the change label. Do you want to continue?",
+        "title": "tag",
+        "update_tag": "Modify the label",
+        "update_tag_hint": "Please enter a new label name"
+    }
+}
