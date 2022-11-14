@@ -4,7 +4,6 @@ import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
 import { createPinia } from 'pinia';
 
-import router from '@/plugins/router';
 import i18n from '@/i18n';
 
 import '@/main.less';
@@ -39,6 +38,5 @@ self.MonacoEnvironment = {
 createApp(App)
     .use(ElementPlus)
     .use(createPinia())
-    .use(router)
     .use(i18n)
     .mount('#app')

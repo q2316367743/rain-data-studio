@@ -5,6 +5,10 @@ const { app, BrowserWindow, Menu } = require('electron');
 const isDev = process.env.IS_DEV === "true";
 process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true';
 
+// 引入处理器
+const ApplicationHandler = require('./handler/ApplicationHandler');
+const DialogHandler = require('./handler/DialogHandler');
+
 function createWindow() {
     // null值取消顶部菜单栏
     Menu.setApplicationMenu(null);
@@ -34,10 +38,15 @@ function createWindow() {
     ).then(() => {
         console.log("创建成功");
     });
+
     // 打开开发者工具
     if (isDev) {
         mainWindow.webContents.openDevTools();
     }
+
+    // 注册应用处理器
+    ApplicationHandler(mainWindow);
+    DialogHandler(mainWindow);
 }
 
 // This method will be called when Electron has finished

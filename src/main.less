@@ -32,7 +32,9 @@
     bottom: 0;
     padding: 0;
     margin: 0;
+    color: #f2f2f2;
 }
+
 // 标题栏
 #header {
     -webkit-app-region: drag;
@@ -42,6 +44,35 @@
     right: 0;
     height: 30px;
     background-color: #0a0a0a;
+    display: grid;
+    grid-template-rows: 1fr;
+    grid-template-columns: 30px 1fr 1fr 90px;
+    line-height: 30px;
+
+    .header-logo {
+        padding: 5px;
+    }
+
+    .header-option {
+        text-align: right;
+        float: right;
+        display: flex;
+
+        .header-option-btn {
+            width: 30px;
+            cursor: pointer;
+            -webkit-app-region: no-drag;
+
+            &:hover {
+                background-color: #232323;
+            }
+
+            .el-icon {
+                top: 5px;
+                right: 5px;
+            }
+        }
+    }
 }
 
 // 侧边栏
@@ -52,6 +83,23 @@
     bottom: 21px;
     width: 45px;
     background-color: #363636;
+
+    .side-btn {
+        height: 45px;
+        line-height: 45px;
+        text-align: center;
+        align-items: center;
+        color: #ffffff;
+        cursor: pointer;
+
+        .el-icon {
+            margin: 5px 5px;
+        }
+
+        &.active {
+            background-color: #2b579a;
+        }
+    }
 }
 
 // 侧边栏面板
