@@ -58,21 +58,21 @@ export default interface Field {
     /**
      * 自增数字
      */
-    autoIncrement: number;
+    autoIncrement?: number;
 
     /**
      * 列类型：NORMAL、GENERATED_VIRTUAL、GENERATED_STORED
      */
-    columnKind: string;
+    columnKind?: string;
 
     /**
      * 更新时
      */
-    onUpdate: string;
+    onUpdate?: string;
 
     /**
      * 排序：
      */
-    collation: string;
+    collation?: string;
 
 }

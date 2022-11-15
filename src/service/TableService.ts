@@ -13,4 +13,10 @@ export default class TableService {
         return this.instance.toArray()
     }
 
+    save(table: Table): Promise<number> {
+        table.createTime = new Date();
+        table.updateTime = new Date();
+        return this.instance.put(table);
+    }
+
 }

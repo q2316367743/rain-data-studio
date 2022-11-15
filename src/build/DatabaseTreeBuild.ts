@@ -70,8 +70,17 @@ function buildTable(
                 data: table,
                 children: []
             } as DatabaseTreeItem;
+            let fieldTypeItem = {
+                id: new Date().getTime(),
+                name: '列',
+                type: DatabaseTreeItemType.GROUP,
+                children: []
+            } as DatabaseTreeItem;
             // 字段
-            buildField(tableItem.id, tableItem.children, fieldMap);
+            buildField(tableItem.id, fieldTypeItem.children, fieldMap);
+            if (fieldTypeItem.children.length > 0) {
+                tableItem.children.push(fieldTypeItem);
+            }
             // 将表插入
             databaseItemChildren.push(tableItem);
         }

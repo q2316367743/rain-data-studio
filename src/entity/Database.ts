@@ -38,6 +38,6 @@ export default interface Database {
     /**
      * SQL路径
      */
-    sqlPath: string;
+    sqlPath?: string;
 
 }

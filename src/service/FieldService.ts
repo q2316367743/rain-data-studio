@@ -13,4 +13,10 @@ export default class FieldService {
         return this.instance.toArray()
     }
 
+    save(field: Field): Promise<number> {
+        field.createTime = new Date();
+        field.updateTime = new Date();
+        return this.instance.put(field);
+    }
+
 }

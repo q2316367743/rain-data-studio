@@ -105,7 +105,7 @@
     <el-dialog v-model="newDatabaseDialog" title="新建链接">
         <new-database v-model="newDatabaseData" />
         <template #footer>
-            <el-button type="primary">保存</el-button>
+            <el-button type="primary" @click="createInstance">保存</el-button>
         </template>
     </el-dialog>
 </template>
@@ -138,6 +138,13 @@ import InstanceTypeEnum from '@/enumeration/InstanceTypeEnum';
 
 // 实体对象
 import Instance from '@/entity/Instance';
+import databaseStrategyContext from './strategy/Database/DatabaseStrategyContext';
+
+// 其他
+import { instanceService } from '@/global/BeanFactory';
+import { ElMessage } from 'element-plus';
+import emitter from '@/plugins/mitt';
+import MessageEventEnum from '@/enumeration/MessageEventEnum';
 
 
 export default defineComponent({
@@ -167,13 +174,39 @@ export default defineComponent({
         showDatabaseDialog() {
             this.newDatabaseDialog = true;
             this.newDatabaseData = {
-                name: '',
+                name: '测试',
                 type: InstanceTypeEnum.MYSQL,
-                host: '127.0.0.1',
+                host: '192.168.31.31',
                 port: 3306,
-                username: '',
-                password: ''
+                username: 'root',
+                password: '123456'
             } as Instance;
+        },
+        async createInstance() {
+            // 先保存实例
+            let instance = JSON.parse(JSON.stringify(this.newDatabaseData)) as Instance;
+            let instanceId = await instanceService.save(instance);
+            instance.id = instanceId
+            // 再进行初始化
+            databaseStrategyContext.getStrategy(InstanceTypeEnum.MYSQL)
+                .init(instance)
+                .then(() => {
+                    ElMessage({
+                        showClose: true,
+                        type: 'success',
+                        message: '初始化成功'
+                    });
+                    emitter.emit(MessageEventEnum.APPLICATION_DATABASE_REFRESH)
+                }).catch((e: Error) => {
+                    ElMessage({
+                        showClose: true,
+                        type: 'error',
+                        message: '初始化失败，' + e
+                    });
+                }).finally(() => {
+                    // 完成后关闭对话框
+                    this.newDatabaseDialog = false;
+                });
         },
         onFile(command: string) {
             switch (command) {

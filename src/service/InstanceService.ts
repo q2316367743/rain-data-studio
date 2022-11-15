@@ -13,4 +13,10 @@ export default class InstanceService {
         return this.instance.toArray()
     }
 
+    save(instance: Instance): Promise<number> {
+        instance.createTime = new Date();
+        instance.updateTime = new Date();
+        return this.instance.put(instance);
+    }
+
 }

@@ -13,4 +13,10 @@ export default class DatabaseService {
         return this.instance.toArray()
     }
 
+    save(database: Database): Promise<number> {
+        database.createTime = new Date();
+        database.updateTime = new Date();
+        return this.instance.put(database);
+    }
+
 }

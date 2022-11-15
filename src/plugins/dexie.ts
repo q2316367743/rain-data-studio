@@ -14,7 +14,7 @@ export default class DexieInstance extends Dexie {
     private readonly field: Dexie.Table<Field, number>;
 
     constructor() {
-        super('es-client');
+        super('rain-data-studio');
         this.version(4).stores({
             instance: '++id, &name',
             database: '++id, instanceId',

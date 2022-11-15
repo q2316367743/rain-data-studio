@@ -9,6 +9,9 @@ process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true';
 const ApplicationHandler = require('./handler/ApplicationHandler');
 const DialogHandler = require('./handler/DialogHandler');
 
+// 引入处理器
+require('./handler/MySqlHandler')
+
 function createWindow() {
     // null值取消顶部菜单栏
     Menu.setApplicationMenu(null);
