@@ -7,13 +7,14 @@
             </el-icon>
         </div>
         <div class="header-menu">
+
             <rain-menu>
                 <el-dropdown trigger="click" @command="onFile">
                     <rain-menu-item>文件</rain-menu-item>
                     <template #dropdown>
                         <el-dropdown-menu>
-                            <el-dropdown-item>新建链接</el-dropdown-item>
-                            <el-dropdown-item>新建文件</el-dropdown-item>
+                            <el-dropdown-item command="new-connect">新建链接</el-dropdown-item>
+                            <el-dropdown-item command="new-file">新建文件</el-dropdown-item>
                             <el-dropdown-item command="exit">退出</el-dropdown-item>
 
                         </el-dropdown-menu>
@@ -58,24 +59,32 @@
     </div>
     <!-- 侧边栏 -->
     <div id="side">
-        <div class="side-btn" :class="menu === 1 ? 'active' : ''" @click="menu = 1">
-            <el-icon :size="30">
-                <database />
-            </el-icon>
-        </div>
-        <div class="side-btn" :class="menu === 2 ? 'active' : ''" @click="menu = 2">
-            <el-icon :size="30">
-                <file-sql />
-            </el-icon>
-        </div>
-        <div class="side-btn" :class="menu === 3 ? 'active' : ''" @click="menu = 3">
-            <el-icon :size="30">
-                <record />
-            </el-icon>
-        </div>
+        <el-tooltip effect="dark" content="数据库" placement="right">
+            <div class="side-btn" :class="menu === 1 ? 'active' : ''" @click="menu = 1">
+                <el-icon :size="30">
+                    <database-vue />
+                </el-icon>
+            </div>
+        </el-tooltip>
+        <el-tooltip effect="dark" content="SQL文件" placement="right">
+            <div class="side-btn" :class="menu === 2 ? 'active' : ''" @click="menu = 2">
+                <el-icon :size="30">
+                    <file-sql />
+                </el-icon>
+            </div>
+        </el-tooltip>
+        <el-tooltip effect="dark" content="查询记录" placement="right">
+            <div class="side-btn" :class="menu === 3 ? 'active' : ''" @click="menu = 3">
+                <el-icon :size="30">
+                    <record />
+                </el-icon>
+            </div>
+        </el-tooltip>
     </div>
     <!-- 侧边面板 -->
-    <div id="side-panel"></div>
+    <div id="side-panel">
+        <database-panel />
+    </div>
     <!-- 容器 -->
     <div id="container">
         <!-- 主视图 -->
@@ -85,6 +94,14 @@
     </div>
     <!-- 状态栏 -->
     <div id="status"></div>
+
+    <!-- 对话框 -->
+    <el-dialog v-model="newDatabaseDialog" title="新建链接">
+        <new-database v-model="newDatabaseData" />
+        <template #footer>
+            <el-button type="primary">保存</el-button>
+        </template>
+    </el-dialog>
 </template>
 
 <script lang='ts'>
@@ -98,7 +115,7 @@ import { showMessageBox } from '@/api/DialogApi';
 
 // 图标 
 import Logo from '@/icon/Logo.vue';
-import Database from '@/icon/Database.vue';
+import DatabaseVue from '@/icon/Database.vue';
 import FileSql from '@/icon/FileSql.vue';
 import Record from '@/icon/Record.vue'
 
@@ -106,24 +123,57 @@ import Record from '@/icon/Record.vue'
 import RainMenu from '@/components/RainMenu/index.vue';
 import RainMenuItem from '@/components/RainMenu/Item.vue';
 
+// 模块
+import NewDatabase from '@/module/NewDatabase/index.vue';
+import DatabasePanel from '@/module/DatabasePanel/index.vue';
+
+// 枚举
+import InstanceTypeEnum from '@/enumeration/InstanceTypeEnum';
+
+// 实体对象
+import Instance from '@/entity/Instance';
+
 
 export default defineComponent({
     components: {
-        Close, Minus, FullScreen, Database, FileSql, Record, Logo,
-        RainMenu, RainMenuItem
+        Close, Minus, FullScreen, DatabaseVue, FileSql, Record, Logo,
+        RainMenu, RainMenuItem, NewDatabase, DatabasePanel
     },
     data: () => {
         return {
             title: '雨 - 编辑器',
-            menu: 1
+            menu: 1,
+            newDatabaseDialog: false,
+            newDatabaseData: {
+                name: '',
+                type: InstanceTypeEnum.MYSQL,
+                host: '127.0.0.1',
+                port: 3306,
+                username: '',
+                password: ''
+            } as Instance
         }
     },
     methods: {
         toMin,
         toMax,
         doClose,
+        showDatabaseDialog() {
+            this.newDatabaseDialog = true;
+            this.newDatabaseData = {
+                name: '',
+                type: InstanceTypeEnum.MYSQL,
+                host: '127.0.0.1',
+                port: 3306,
+                username: '',
+                password: ''
+            } as Instance;
+        },
         onFile(command: string) {
-            switch(command) {
+            switch (command) {
+                case 'new-connect':
+                    this.showDatabaseDialog();
+                    break;
                 case 'exit':
                     doClose();
                     break;
