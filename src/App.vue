@@ -1,13 +1,14 @@
 <template>
     <!-- 标题栏 -->
     <div id="header">
+        <!-- LOGO -->
         <div class="header-logo">
             <el-icon :size="20">
                 <logo />
             </el-icon>
         </div>
+        <!-- 菜单栏 -->
         <div class="header-menu">
-
             <rain-menu>
                 <el-dropdown trigger="click" @command="onFile">
                     <rain-menu-item>文件</rain-menu-item>
@@ -38,18 +39,23 @@
                 </el-dropdown>
             </rain-menu>
         </div>
+        <!-- 标题栏 -->
         <div class="header-title">{{ title }}</div>
+        <!-- 操作按钮 -->
         <div class="header-option">
+            <!-- 最小化 -->
             <div class="header-option-btn" @click="toMin">
                 <el-icon :size="20">
                     <minus />
                 </el-icon>
             </div>
+            <!-- 最大化 -->
             <div class="header-option-btn" @click="toMax">
                 <el-icon :size="20">
                     <full-screen />
                 </el-icon>
             </div>
+            <!-- 关闭 -->
             <div class="header-option-btn" @click="doClose">
                 <el-icon :size="20">
                     <close />
@@ -83,7 +89,7 @@
     </div>
     <!-- 侧边面板 -->
     <div id="side-panel">
-        <database-panel />
+        <database-panel v-show="menu === 1" />
     </div>
     <!-- 容器 -->
     <div id="container">

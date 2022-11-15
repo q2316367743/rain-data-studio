@@ -23,6 +23,14 @@
     color: #fff;
 }
 
+// 全局变量
+:root {
+    --background-color-main: #262626;
+    --background-color-side: #363636;
+    --border-color-main: #484644;
+    --color: #ffffff;
+}
+
 // 应用
 #app {
     position: fixed;
@@ -32,7 +40,7 @@
     bottom: 0;
     padding: 0;
     margin: 0;
-    color: #f2f2f2;
+    color: var(--color);
 }
 
 // 标题栏
@@ -82,14 +90,14 @@
     left: 0px;
     bottom: 21px;
     width: 45px;
-    background-color: #363636;
+    background-color: var(--background-color-side);
 
     .side-btn {
         height: 45px;
         line-height: 45px;
         text-align: center;
         align-items: center;
-        color: #ffffff;
+        color: var(--color);
         cursor: pointer;
 
         .el-icon {
@@ -109,8 +117,8 @@
     left: 45px;
     bottom: 21px;
     width: 300px;
-    border-right: 1px solid #484644;
-    background-color: #262626;
+    border-right: 1px solid var(--border-color-main);
+    background-color: var(--background-color-main);
 }
 
 // 容器
@@ -120,7 +128,7 @@
     left: 346px;
     bottom: 21px;
     right: 0;
-    background-color: #262626;
+    background-color: var(--background-color-main);
 }
 
 // 主面板
@@ -136,8 +144,8 @@
     right: 0;
     bottom: 0;
     height: 20px;
-    border-top: 1px solid #484644;
-    background-color: #323130;
+    border-top: 1px solid var(--border-color-main);
+    background-color: var(--background-color-side);
 }
 
 // 常用动画

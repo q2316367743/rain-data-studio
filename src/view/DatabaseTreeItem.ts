@@ -4,6 +4,11 @@ import DatabaseTreeItemType from "@/enumeration/DatabaseTreeItemType";
 export default interface DatabaseTreeItem {
 
     /**
+     * 唯一ID
+     */
+    id: number;
+
+    /**
      * 显示的名字
      */
     name: string;
