@@ -1,4 +1,7 @@
+import Database from "@/entity/Database";
+import Field from "@/entity/Field";
 import Instance from "@/entity/Instance";
+import Table from "@/entity/Table";
 import DatabaseTreeItemType from "@/enumeration/DatabaseTreeItemType";
 
 export default interface DatabaseTreeItem {
@@ -21,7 +24,7 @@ export default interface DatabaseTreeItem {
     /**
      * 此处保存的数据
      */
-    data: Instance;
+    data?: Instance | Database | Table | Field;
 
     /**
      * 子项

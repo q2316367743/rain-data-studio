@@ -25,4 +25,19 @@ export default interface Database {
      */
     name: string;
 
+    /**
+     * 默认字符集名称
+     */
+    defaultCharacterSetName?: string;
+
+    /**
+     * 默认集合名称
+     */
+    defaultCollationName?: string;
+
+    /**
+     * SQL路径
+     */
+    sqlPath: string;
+
 }

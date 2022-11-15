@@ -39,7 +39,7 @@ enum DatabaseTreeItem {
     /**
      * 字段
      */
-    COLUMN = 7,
+    FIELD = 7,
 
     /**
      * 键
