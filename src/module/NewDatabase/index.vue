@@ -95,7 +95,7 @@ export default defineComponent({
                     });
                 }).finally(() => {
                     // 完成后关闭对话框
-                    this.instance = false;
+                    this.dialog = false;
                 });
         },
     }
