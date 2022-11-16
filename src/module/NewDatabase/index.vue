@@ -69,6 +69,9 @@ export default defineComponent({
     watch: {
         dialog(newValue) {
             this.$emit('update:modelValue', newValue);
+        },
+        modelValue(newValue) {
+            this.dialog = newValue;
         }
     },
     methods: {

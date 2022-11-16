@@ -5,17 +5,22 @@
         <div class="side-panel-database-title">
             <div style="display: flex;">
                 <!-- 新增实例 -->
-                <div class="side-panel-database-option" @click="showNewDatabaseDialog">
-                    <el-icon :size="16">
-                        <Plus />
-                    </el-icon>
-                </div>
+                <el-tooltip effect="dark" content="新增实例" placement="bottom">
+                    <div class="side-panel-database-option" @click="newDatabaseDialog = true">
+                        <el-icon :size="16">
+                            <Plus />
+                        </el-icon>
+                    </div>
+                </el-tooltip>
                 <!-- 刷新 -->
-                <div class="side-panel-database-option" :class="!treeCurrent ? 'disabled' : ''" @click="refreshClick">
-                    <el-icon :size="16">
-                        <Refresh />
-                    </el-icon>
-                </div>
+                <el-tooltip effect="dark" content="刷新" placement="bottom">
+                    <div class="side-panel-database-option" :class="!treeCurrent ? 'disabled' : ''"
+                        @click="refreshClick">
+                        <el-icon :size="16">
+                            <Refresh />
+                        </el-icon>
+                    </div>
+                </el-tooltip>
                 <!-- 属性 -->
                 <div class="side-panel-database-option" :class="!treeCurrent ? 'disabled' : ''" @click="infoClick">
                     <el-icon :size="16">
@@ -64,11 +69,13 @@
             <el-scrollbar>
                 <el-tree :data="treeItems" :props="defaultProps" class="rain-tree" :expand-on-click-node="false"
                     empty-text="暂无链接" ref="treeRef" node-key="nodeKey" render-after-expand
-                    :filter-node-method="filterNode" @node-click="nodeClick">
+                    :filter-node-method="filterNode" @node-click="nodeClick" @node-contextmenu="nodeContextmenu">
                     <template #default="{ node, data }">
                         <div class="rain-tree-node">
                             <el-icon :size="14">
-                                <my-sql-icon v-if="data.type === 1" />
+                                <el-badge is-dot v-if="data.type === 1" :hidden="!data.online">
+                                    <my-sql-icon />
+                                </el-badge>
                                 <architecture-icon v-else-if="data.type === 2" />
                                 <folder-icon v-else-if="data.type === 3 || data.type === 6" />
                                 <table-icon v-else-if="data.type === 4" />
@@ -105,6 +112,43 @@
                 <el-button type="primary" @click="clickDatabaseShow">保存</el-button>
             </template>
         </el-dialog>
+
+        <rain-context-menu :top="top" :left="left" v-model="showContext">
+            <rain-context-menu-item v-if="treeCurrent && treeCurrent?.type === 1">属性</rain-context-menu-item>
+            <rain-context-menu-item :show-expand="true">
+                <template #default>新建</template>
+                <template #expand>
+                    <rain-context-menu-sub>
+                        <rain-context-menu-item>表</rain-context-menu-item>
+                    </rain-context-menu-sub>
+                </template>
+            </rain-context-menu-item>
+            <rain-context-menu-item>重命名</rain-context-menu-item>
+            <rain-context-menu-item :show-expand="true">
+                <template #default>导航</template>
+                <template #expand>
+                    <rain-context-menu-sub>
+                        <rain-context-menu-item>转到DDL</rain-context-menu-item>
+                        <rain-context-menu-item>转到查询控制台</rain-context-menu-item>
+                    </rain-context-menu-sub>
+                </template>
+            </rain-context-menu-item>
+            <rain-context-menu-item>快速文档</rain-context-menu-item>
+            <rain-context-menu-item>刷新</rain-context-menu-item>
+            <rain-context-menu-item>停用</rain-context-menu-item>
+            <rain-context-menu-item v-if="treeCurrent && treeCurrent?.type === 1" @click="remove">移除
+            </rain-context-menu-item>
+            <rain-context-menu-item v-else>删除</rain-context-menu-item>
+            <rain-context-menu-item :show-expand="true">
+                <template #default>SQL脚本</template>
+                <template #expand>
+                    <rain-context-menu-sub>
+                        <rain-context-menu-item>将DDL复制到剪切板</rain-context-menu-item>
+                        <rain-context-menu-item>转到查询控制台</rain-context-menu-item>
+                    </rain-context-menu-sub>
+                </template>
+            </rain-context-menu-item>
+        </rain-context-menu>
     </div>
 </template>
 <script lang="ts">
@@ -128,6 +172,10 @@ import databaseTreeBuild from "@/build/DatabaseTreeBuild";
 
 // 模块
 import NewDatabase from '@/module/NewDatabase/index.vue';
+// 组件
+import RainContextMenu from "@/components/RainContextMenu/index.vue";
+import RainContextMenuItem from "@/components/RainContextMenu/item.vue";
+import RainContextMenuSub from "@/components/RainContextMenu/sub.vue";
 
 // 枚举
 import InstanceTypeEnum from '@/enumeration/InstanceTypeEnum';
@@ -140,7 +188,7 @@ import Instance from '@/entity/Instance';
 // 其他
 import { databaseService, instanceService } from '@/global/BeanFactory';
 import databaseStrategyContext from '@/strategy/Database/DatabaseStrategyContext';
-import { ElMessage } from 'element-plus';
+import { ElLoading, ElMessage, ElMessageBox } from 'element-plus';
 import emitter from '@/plugins/mitt';
 import Database from "@/entity/Database";
 
@@ -150,7 +198,7 @@ export default defineComponent({
         MySqlIcon, ArchitectureIcon, TableIcon, FolderIcon, FieldIcon, Search,
         EndOpenIcon, EndCloseIcon, AttributeIcon, StopIcon,
         Plus, Refresh, InfoFilled,
-        NewDatabase
+        NewDatabase, RainContextMenu, RainContextMenuItem, RainContextMenuSub
     },
     data: () => ({
         loading: false,
@@ -164,25 +212,26 @@ export default defineComponent({
         treeNodeKeys: [] as Array<string>,
         defaultExpandedKeys: [] as Array<string>,
         newDatabaseDialog: false,
-        newDatabaseData: {
-            name: '',
-            type: InstanceTypeEnum.MYSQL,
-            host: '127.0.0.1',
-            port: 3306,
-            username: '',
-            password: '',
-            database: ''
-        } as Instance,
+
+        // 显示数据库列表
         showDatabaseDialog: false,
         showDatabaseTitle: '',
         showDatabaseData: [] as Array<Database>,
         showDatabaseModel: [] as Array<number>,
-        showDatabaseInstanceId: 0
+        showDatabaseInstanceId: 0,
+
+        // 右键菜单相关
+        showContext: false,
+        top: 0,
+        left: 0,
     }),
     created() {
         this.refresh();
         emitter.on(MessageEventEnum.APPLICATION_INSTANCE_ADD, () => {
-            this.showNewDatabaseDialog()
+            this.newDatabaseDialog = true;
+        });
+        emitter.on(MessageEventEnum.APPLICATION_INSTANCE_REFRESH, () => {
+            this.refresh()
         })
     },
     watch: {
@@ -202,18 +251,6 @@ export default defineComponent({
         },
 
         // >-------------------------- 上方按钮 -------------------------->
-        showNewDatabaseDialog() {
-            this.newDatabaseDialog = true;
-            this.newDatabaseData = {
-                name: '测试',
-                type: InstanceTypeEnum.MYSQL,
-                host: '192.168.31.31',
-                port: 3306,
-                username: 'root',
-                password: '123456',
-                database: ''
-            } as Instance;
-        },
         /**
          * 获取实例
          */
@@ -241,32 +278,6 @@ export default defineComponent({
         },
         // <-------------------------- 上方按钮 --------------------------<
 
-        async createInstance() {
-            // 先保存实例
-            let instance = JSON.parse(JSON.stringify(this.newDatabaseData)) as Instance;
-            let instanceId = await instanceService.save(instance);
-            instance.id = instanceId
-            // 再进行初始化
-            databaseStrategyContext.getStrategy(InstanceTypeEnum.MYSQL)
-                .init(instance)
-                .then(() => {
-                    ElMessage({
-                        showClose: true,
-                        type: 'success',
-                        message: '初始化成功'
-                    });
-                    this.refresh();
-                }).catch((e: Error) => {
-                    ElMessage({
-                        showClose: true,
-                        type: 'error',
-                        message: '初始化失败，' + e
-                    });
-                }).finally(() => {
-                    // 完成后关闭对话框
-                    this.newDatabaseDialog = false;
-                });
-        },
         /**
          * 打开数据库展示选择
          * @param instance 实例
@@ -314,9 +325,73 @@ export default defineComponent({
             }
             return data.nameKey.includes(value)
         },
+
+        // >-------------------------- 树形节点事件 -------------------------->
         nodeClick(data: DatabaseTreeItem) {
             this.treeCurrent = data;
+            this.showContext = false;
+        },
+        nodeContextmenu(event: PointerEvent, data: DatabaseTreeItem) {
+            this.treeCurrent = data;
+            this.showContext = true;
+            this.top = event.clientY;
+            this.left = event.clientX;
+        },
+        // <-------------------------- 树形节点事件 --------------------------<
+
+        // >-------------------------- 菜单事件 -------------------------->
+        remove() {
+            if (!this.treeCurrent) {
+                ElMessage({
+                    showClose: true,
+                    type: "error",
+                    message: '系统异常，实例未选择'
+                });
+                return;
+            }
+            if (this.treeCurrent.type !== DatabaseTreeItemType.INSTANCE) {
+                ElMessage({
+                    showClose: true,
+                    type: "error",
+                    message: '系统异常，选择的并不是实例'
+                });
+                return;
+            }
+            // 移除
+            ElMessageBox.confirm(
+                `确定要删除实例【${this.treeCurrent?.name}】，删除后将无法恢复！`,
+                '删除警告',
+                {
+                    confirmButtonText: '删除',
+                    cancelButtonText: '取消'
+                }).then(() => {
+                    const loading = ElLoading.service({
+                        lock: true,
+                        text: `开始删除实例【${this.treeCurrent?.name}】`,
+                        background: 'rgba(0, 0, 0, 0.7)',
+                    });
+                    instanceService.removeAll(this.treeCurrent?.id!)
+                        .then(() => {
+                            ElMessage({
+                                showClose: true,
+                                type: "success",
+                                message: '删除成功'
+                            });
+                            this.refresh()
+                        }).catch((e) => {
+                            ElMessage({
+                                showClose: true,
+                                type: "error",
+                                message: '删除失败，' + e
+                            });
+                        }).finally(() => {
+                            loading.close()
+                        })
+                }).catch(() => {
+                    console.log(`取消删除【${this.treeCurrent?.name}】`);
+                })
         }
+        // <-------------------------- 菜单事件 --------------------------<
     }
 });
 </script>

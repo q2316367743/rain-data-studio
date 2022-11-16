@@ -9,7 +9,7 @@ import TableService from "@/service/TableService";
 const dexieInstance = new DexieInstance();
 
 // 导出数据库实例服务
-export const instanceService = new InstanceService(dexieInstance.getInstance());
+export const instanceService = new InstanceService(dexieInstance, dexieInstance.getInstance());
 export const databaseService = new DatabaseService(dexieInstance, dexieInstance.getDatabase());
 export const tableService = new TableService(dexieInstance.getTable());
 export const fieldService = new FieldService(dexieInstance.getField());
