@@ -4,16 +4,33 @@
         <!-- 顶部按钮 -->
         <div class="side-panel-database-title">
             <div style="display: flex;">
+                <!-- 新增实例 -->
                 <div class="side-panel-database-option" @click="showNewDatabaseDialog">
                     <el-icon :size="16">
                         <Plus />
                     </el-icon>
                 </div>
-                <div class="side-panel-database-option" @click="refresh">
+                <!-- 刷新 -->
+                <div class="side-panel-database-option" :class="!treeCurrent ? 'disabled' : ''" @click="refreshClick">
                     <el-icon :size="16">
                         <Refresh />
                     </el-icon>
                 </div>
+                <!-- 属性 -->
+                <div class="side-panel-database-option" :class="!treeCurrent ? 'disabled' : ''" @click="infoClick">
+                    <el-icon :size="16">
+                        <info-filled />
+                    </el-icon>
+                </div>
+                <!-- 停用 -->
+                <div class="side-panel-database-option" :class="!treeCurrent ? 'disabled' : ''">
+                    <el-icon :size="14" style="margin: 8px;">
+                        <stop-icon />
+                    </el-icon>
+                </div>
+            </div>
+            <div style="display: flex;">
+                <!-- 搜索 -->
                 <el-popover :width="200"
                     popper-style="box-shadow: rgb(14 18 22 / 35%) 0px 10px 38px -10px, rgb(14 18 22 / 20%) 0px 10px 20px -15px; padding: 20px;"
                     trigger="click" effect="dark">
@@ -28,13 +45,13 @@
                     </template>
                     <el-input v-model="treeFilterText" size="small"></el-input>
                 </el-popover>
-            </div>
-            <div style="display: flex;">
+                <!-- 展开 -->
                 <div class="side-panel-database-option">
                     <el-icon :size="16">
                         <end-open-icon />
                     </el-icon>
                 </div>
+                <!-- 收起 -->
                 <div class="side-panel-database-option">
                     <el-icon :size="20" style="margin: 5px;">
                         <end-close-icon />
@@ -47,7 +64,7 @@
             <el-scrollbar>
                 <el-tree :data="treeItems" :props="defaultProps" class="rain-tree" :expand-on-click-node="false"
                     empty-text="暂无链接" ref="treeRef" node-key="nodeKey" render-after-expand
-                    :filter-node-method="filterNode">
+                    :filter-node-method="filterNode" @node-click="nodeClick">
                     <template #default="{ node, data }">
                         <div class="rain-tree-node">
                             <el-icon :size="14">
@@ -99,7 +116,7 @@
 import DatabaseTreeItem from "@/view/DatabaseTreeItem";
 import { defineComponent } from "vue";
 
-import { Plus, Refresh, Search } from "@element-plus/icons-vue";
+import { Plus, Refresh, Search, InfoFilled } from "@element-plus/icons-vue";
 
 // 引入图标
 import MySqlIcon from '@/icon/MySql.vue';
@@ -109,6 +126,8 @@ import FolderIcon from '@/icon/Folder.vue';
 import FieldIcon from "@/icon/Field.vue";
 import EndOpenIcon from "@/icon/EndOpen.vue";
 import EndCloseIcon from "@/icon/EndClose.vue";
+import AttributeIcon from "@/icon/Attribute.vue";
+import StopIcon from "@/icon/Stop.vue";
 
 import databaseTreeBuild from "@/build/DatabaseTreeBuild";
 
@@ -118,6 +137,7 @@ import NewDatabase from '@/module/NewDatabase/index.vue';
 // 枚举
 import InstanceTypeEnum from '@/enumeration/InstanceTypeEnum';
 import MessageEventEnum from '@/enumeration/MessageEventEnum';
+import DatabaseTreeItemType from "@/enumeration/DatabaseTreeItemType";
 
 // 实体对象
 import Instance from '@/entity/Instance';
@@ -128,13 +148,13 @@ import { databaseService, instanceService } from '@/global/BeanFactory';
 import { ElMessage } from 'element-plus';
 import emitter from '@/plugins/mitt';
 import Database from "@/entity/Database";
-import DatabaseTreeItemType from "@/enumeration/DatabaseTreeItemType";
 
 export default defineComponent({
     name: 'DatabasePanel',
     components: {
-        MySqlIcon, ArchitectureIcon, TableIcon, FolderIcon, FieldIcon, Search, EndOpenIcon, EndCloseIcon,
-        Plus, Refresh,
+        MySqlIcon, ArchitectureIcon, TableIcon, FolderIcon, FieldIcon, Search,
+        EndOpenIcon, EndCloseIcon, AttributeIcon, StopIcon,
+        Plus, Refresh, InfoFilled,
         NewDatabase
     },
     data: () => ({
@@ -144,6 +164,7 @@ export default defineComponent({
             label: 'name'
         },
         treeFilterText: '',
+        treeCurrent: undefined as DatabaseTreeItem | undefined,
         treeItems: [] as Array<DatabaseTreeItem>,
         treeNodeKeys: [] as Array<string>,
         defaultExpandedKeys: [] as Array<string>,
@@ -184,6 +205,8 @@ export default defineComponent({
                 this.loading = false;
             });
         },
+
+        // >-------------------------- 上方按钮 -------------------------->
         showNewDatabaseDialog() {
             this.newDatabaseDialog = true;
             this.newDatabaseData = {
@@ -196,6 +219,33 @@ export default defineComponent({
                 database: ''
             } as Instance;
         },
+        /**
+         * 获取实例
+         */
+        getInstance(): DatabaseTreeItem {
+            let instance = this.treeCurrent!
+            if (instance.type !== DatabaseTreeItemType.INSTANCE) {
+                let nodeKey = this.treeCurrent!.nodeKey;
+                let instanceNodeKey = nodeKey.substring(0, nodeKey.indexOf('-'));
+                for(let item of this.treeItems) {
+                    if (item.nodeKey === instanceNodeKey) {
+                        instance = item;
+                        break;
+                    }
+                }
+            }
+            return instance
+        },
+        refreshClick() {
+            if (!this.treeCurrent) return;
+            console.log(this.treeCurrent)
+        },
+        infoClick() {
+            if (!this.treeCurrent) return;
+            console.log(this.getInstance())
+        },
+        // <-------------------------- 上方按钮 --------------------------<
+
         async createInstance() {
             // 先保存实例
             let instance = JSON.parse(JSON.stringify(this.newDatabaseData)) as Instance;
@@ -268,6 +318,9 @@ export default defineComponent({
                 return false;
             }
             return data.nameKey.includes(value)
+        },
+        nodeClick(data: DatabaseTreeItem) {
+            this.treeCurrent = data;
         }
     }
 });
@@ -302,6 +355,18 @@ export default defineComponent({
 
         .el-icon {
             margin: 7px;
+        }
+
+        &.disabled {
+            cursor: no-drop;
+
+            .el-icon {
+                color: #5a5a5a !important;
+            }
+
+            &:hover {
+                background-color: var(--background-color-main);
+            }
         }
     }
 }
