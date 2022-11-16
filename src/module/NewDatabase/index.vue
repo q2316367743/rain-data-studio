@@ -21,6 +21,9 @@
         <el-form-item label="密码">
             <el-input v-model="instance.password" type="password" />
         </el-form-item>
+        <el-form-item label="数据库">
+            <el-input v-model="instance.database" />
+        </el-form-item>
     </el-form>
 </template>
 <script lang="ts">
@@ -40,7 +43,8 @@ export default defineComponent({
             host: '127.0.0.1',
             port: 3306,
             username: '',
-            password: ''
+            password: '',
+            database: ''
         } as Instance
     }),
     created() {

@@ -50,4 +50,9 @@ export default interface Instance {
      */
     password: string;
 
+    /**
+     * 数据库，可不选
+     */
+    database?: string;
+
 }

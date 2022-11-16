@@ -26,6 +26,11 @@ export default interface Database {
     name: string;
 
     /**
+     * 是否显示
+     */
+    show: boolean;
+
+    /**
      * 默认字符集名称
      */
     defaultCharacterSetName?: string;

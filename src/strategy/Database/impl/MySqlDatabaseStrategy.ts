@@ -20,7 +20,8 @@ export default class MySqlDatabaseStrategy implements DatabaseStrategy {
                 user: instance.username,
                 password: instance.password,
                 host: instance.host,
-                port: instance.port
+                port: instance.port,
+                database: instance.database
             });
             // 查询全部数据库
             loading.setText('查询全部数据库')
@@ -29,7 +30,7 @@ export default class MySqlDatabaseStrategy implements DatabaseStrategy {
                 sql: 'show databases;'
             });
             // 根据数据库，查询全部的表
-            let databases =  result[0] as Array<any>;
+            let databases = result[0] as Array<any>;
             for (let database of databases) {
                 // 每个数据库
                 let databaseName = database['Database'];
@@ -37,6 +38,8 @@ export default class MySqlDatabaseStrategy implements DatabaseStrategy {
                 let databaseId = await databaseService.save({
                     instanceId: instance.id!,
                     name: databaseName,
+                    // 默认展示
+                    show: true,
                     createTime: new Date(),
                 });
                 // 查询表的结果
@@ -44,7 +47,7 @@ export default class MySqlDatabaseStrategy implements DatabaseStrategy {
                     id: instance.id!,
                     sql: `select table_name from information_schema.tables where table_schema='${databaseName}';`
                 });
-                let tables =  tableResult[0] as Array<any>;
+                let tables = tableResult[0] as Array<any>;
                 for (let table of tables) {
                     let tableName = table['table_name'];
                     loading.setText(`开始处理数据库【${databaseName}】 - 【${tableName}】`)
@@ -57,8 +60,8 @@ export default class MySqlDatabaseStrategy implements DatabaseStrategy {
                         id: instance.id!,
                         sql: `SHOW FULL COLUMNS FROM ${databaseName}.${tableName};`
                     });
-                    let fields =  fieldResult[0] as Array<any>;
-                    for(let field of fields) {
+                    let fields = fieldResult[0] as Array<any>;
+                    for (let field of fields) {
                         await fieldService.save({
                             instanceId: instance.id!,
                             databaseId: databaseId,

@@ -100,14 +100,6 @@
     </div>
     <!-- 状态栏 -->
     <div id="status"></div>
-
-    <!-- 对话框 -->
-    <el-dialog v-model="newDatabaseDialog" title="新建链接">
-        <new-database v-model="newDatabaseData" />
-        <template #footer>
-            <el-button type="primary" @click="createInstance">保存</el-button>
-        </template>
-    </el-dialog>
 </template>
 
 <script lang='ts'>
@@ -130,19 +122,7 @@ import RainMenu from '@/components/RainMenu/index.vue';
 import RainMenuItem from '@/components/RainMenu/Item.vue';
 
 // 模块
-import NewDatabase from '@/module/NewDatabase/index.vue';
 import DatabasePanel from '@/module/DatabasePanel/index.vue';
-
-// 枚举
-import InstanceTypeEnum from '@/enumeration/InstanceTypeEnum';
-
-// 实体对象
-import Instance from '@/entity/Instance';
-import databaseStrategyContext from './strategy/Database/DatabaseStrategyContext';
-
-// 其他
-import { instanceService } from '@/global/BeanFactory';
-import { ElMessage } from 'element-plus';
 import emitter from '@/plugins/mitt';
 import MessageEventEnum from '@/enumeration/MessageEventEnum';
 
@@ -150,68 +130,22 @@ import MessageEventEnum from '@/enumeration/MessageEventEnum';
 export default defineComponent({
     components: {
         Close, Minus, FullScreen, DatabaseVue, FileSql, Record, Logo,
-        RainMenu, RainMenuItem, NewDatabase, DatabasePanel
+        RainMenu, RainMenuItem, DatabasePanel
     },
     data: () => {
         return {
             title: '雨 - 编辑器',
-            menu: 1,
-            newDatabaseDialog: false,
-            newDatabaseData: {
-                name: '',
-                type: InstanceTypeEnum.MYSQL,
-                host: '127.0.0.1',
-                port: 3306,
-                username: '',
-                password: ''
-            } as Instance
+            menu: 1
         }
     },
     methods: {
         toMin,
         toMax,
         doClose,
-        showDatabaseDialog() {
-            this.newDatabaseDialog = true;
-            this.newDatabaseData = {
-                name: '测试',
-                type: InstanceTypeEnum.MYSQL,
-                host: '192.168.31.31',
-                port: 3306,
-                username: 'root',
-                password: '123456'
-            } as Instance;
-        },
-        async createInstance() {
-            // 先保存实例
-            let instance = JSON.parse(JSON.stringify(this.newDatabaseData)) as Instance;
-            let instanceId = await instanceService.save(instance);
-            instance.id = instanceId
-            // 再进行初始化
-            databaseStrategyContext.getStrategy(InstanceTypeEnum.MYSQL)
-                .init(instance)
-                .then(() => {
-                    ElMessage({
-                        showClose: true,
-                        type: 'success',
-                        message: '初始化成功'
-                    });
-                    emitter.emit(MessageEventEnum.APPLICATION_DATABASE_REFRESH)
-                }).catch((e: Error) => {
-                    ElMessage({
-                        showClose: true,
-                        type: 'error',
-                        message: '初始化失败，' + e
-                    });
-                }).finally(() => {
-                    // 完成后关闭对话框
-                    this.newDatabaseDialog = false;
-                });
-        },
         onFile(command: string) {
             switch (command) {
                 case 'new-connect':
-                    this.showDatabaseDialog();
+                    emitter.emit(MessageEventEnum.APPLICATION_INSTANCE_ADD)
                     break;
                 case 'exit':
                     doClose();
