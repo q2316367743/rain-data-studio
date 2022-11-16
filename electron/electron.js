@@ -10,7 +10,7 @@ const ApplicationHandler = require('./handler/ApplicationHandler');
 const DialogHandler = require('./handler/DialogHandler');
 
 // 引入处理器
-require('./handler/MySqlHandler')
+const MySqlHandler = require('./handler/MySqlHandler');
 
 function createWindow() {
     // null值取消顶部菜单栏
@@ -50,6 +50,7 @@ function createWindow() {
     // 注册应用处理器
     ApplicationHandler(mainWindow);
     DialogHandler(mainWindow);
+    MySqlHandler(mainWindow);
 }
 
 // This method will be called when Electron has finished

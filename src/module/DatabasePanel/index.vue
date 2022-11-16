@@ -135,8 +135,11 @@
             </rain-context-menu-item>
             <rain-context-menu-item>快速文档</rain-context-menu-item>
             <rain-context-menu-item>刷新</rain-context-menu-item>
-            <rain-context-menu-item>停用</rain-context-menu-item>
-            <rain-context-menu-item v-if="treeCurrent && treeCurrent?.type === 1" @click="remove">移除
+            <rain-context-menu-item v-if="treeCurrent && treeCurrent?.type === 1 && !treeCurrent.online"
+                @click="connectInstance">连接</rain-context-menu-item>
+            <rain-context-menu-item v-else-if="treeCurrent && treeCurrent?.type === 1 && treeCurrent.online"
+                @click="stopInstance">停用</rain-context-menu-item>
+            <rain-context-menu-item v-if="treeCurrent && treeCurrent?.type === 1" @click="removeInstance">移除
             </rain-context-menu-item>
             <rain-context-menu-item v-else>删除</rain-context-menu-item>
             <rain-context-menu-item :show-expand="true">
@@ -191,6 +194,7 @@ import databaseStrategyContext from '@/strategy/Database/DatabaseStrategyContext
 import { ElLoading, ElMessage, ElMessageBox } from 'element-plus';
 import emitter from '@/plugins/mitt';
 import Database from "@/entity/Database";
+import { connect } from "@/api/MySqlApi";
 
 export default defineComponent({
     name: 'DatabasePanel',
@@ -202,6 +206,8 @@ export default defineComponent({
     },
     data: () => ({
         loading: false,
+
+        // 树相关
         defaultProps: {
             children: 'children',
             label: 'name'
@@ -210,6 +216,8 @@ export default defineComponent({
         treeCurrent: undefined as DatabaseTreeItem | undefined,
         treeItems: [] as Array<DatabaseTreeItem>,
         treeNodeKeys: [] as Array<string>,
+        onlineNodeKeys: new Set<string>(),
+
         defaultExpandedKeys: [] as Array<string>,
         newDatabaseDialog: false,
 
@@ -232,6 +240,9 @@ export default defineComponent({
         });
         emitter.on(MessageEventEnum.APPLICATION_INSTANCE_REFRESH, () => {
             this.refresh()
+        });
+        emitter.on(MessageEventEnum.APPLICATION_INSTANCE_STATUS, (connectIds: any) => {
+            console.log(connectIds)
         })
     },
     watch: {
@@ -340,7 +351,7 @@ export default defineComponent({
         // <-------------------------- 树形节点事件 --------------------------<
 
         // >-------------------------- 菜单事件 -------------------------->
-        remove() {
+        removeInstance() {
             if (!this.treeCurrent) {
                 ElMessage({
                     showClose: true,
@@ -390,6 +401,64 @@ export default defineComponent({
                 }).catch(() => {
                     console.log(`取消删除【${this.treeCurrent?.name}】`);
                 })
+        },
+        connectInstance() {
+            console.log(this.treeCurrent)
+            if (!this.treeCurrent) {
+                ElMessage({
+                    showClose: true,
+                    type: "error",
+                    message: '系统异常，实例未选择'
+                });
+                return;
+            }
+            if (this.treeCurrent.type !== DatabaseTreeItemType.INSTANCE) {
+                ElMessage({
+                    showClose: true,
+                    type: "error",
+                    message: '系统异常，选择的并不是实例'
+                });
+                return;
+            }
+            let instance = this.treeCurrent.data as Instance
+            if (this.onlineNodeKeys.has(this.treeCurrent?.nodeKey!)) {
+                // 存在跳过
+                return;
+            }
+            connect({
+                id: instance.id!,
+                user: instance.username,
+                password: instance.password,
+                host: instance.host,
+                port: instance.port,
+                database: instance.database
+            }).then(() => {
+                // 连接成功，刷新状态
+                console.log('连接成功，判断是否需要刷新，刷新状态')
+            })
+        },
+        stopInstance() {
+            if (!this.treeCurrent) {
+                ElMessage({
+                    showClose: true,
+                    type: "error",
+                    message: '系统异常，实例未选择'
+                });
+                return;
+            }
+            if (this.treeCurrent.type !== DatabaseTreeItemType.INSTANCE) {
+                ElMessage({
+                    showClose: true,
+                    type: "error",
+                    message: '系统异常，选择的并不是实例'
+                });
+                return;
+            }
+            ElMessage({
+                showClose: true,
+                type: "error",
+                message: '暂未实现'
+            });
         }
         // <-------------------------- 菜单事件 --------------------------<
     }
