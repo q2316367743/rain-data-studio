@@ -89,12 +89,7 @@
             </el-scrollbar>
         </div>
         <!-- 对话框 -->
-        <el-dialog v-model="newDatabaseDialog" title="新建链接" draggable destroy-on-close append-to-body>
-            <new-database v-model="newDatabaseData" />
-            <template #footer>
-                <el-button type="primary" @click="createInstance">保存</el-button>
-            </template>
-        </el-dialog>
+        <new-database v-model="newDatabaseDialog" />
         <!-- 实例下数据库是否显示 -->
         <el-dialog v-model="showDatabaseDialog" :title="showDatabaseTitle" draggable destroy-on-close append-to-body
             top="5vh">
@@ -141,10 +136,10 @@ import DatabaseTreeItemType from "@/enumeration/DatabaseTreeItemType";
 
 // 实体对象
 import Instance from '@/entity/Instance';
-import databaseStrategyContext from '@/strategy/Database/DatabaseStrategyContext';
 
 // 其他
 import { databaseService, instanceService } from '@/global/BeanFactory';
+import databaseStrategyContext from '@/strategy/Database/DatabaseStrategyContext';
 import { ElMessage } from 'element-plus';
 import emitter from '@/plugins/mitt';
 import Database from "@/entity/Database";
@@ -227,7 +222,7 @@ export default defineComponent({
             if (instance.type !== DatabaseTreeItemType.INSTANCE) {
                 let nodeKey = this.treeCurrent!.nodeKey;
                 let instanceNodeKey = nodeKey.substring(0, nodeKey.indexOf('-'));
-                for(let item of this.treeItems) {
+                for (let item of this.treeItems) {
                     if (item.nodeKey === instanceNodeKey) {
                         instance = item;
                         break;
