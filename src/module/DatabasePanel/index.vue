@@ -71,7 +71,7 @@
                     empty-text="暂无链接" ref="treeRef" node-key="nodeKey" render-after-expand
                     :filter-node-method="filterNode" @node-click="nodeClick" @node-contextmenu="nodeContextmenu">
                     <template #default="{ node, data }">
-                        <div class="rain-tree-node">
+                        <div class="rain-tree-node" @dblclick="nodeDbClick(data)">
                             <el-icon :size="14">
                                 <el-badge is-dot v-if="data.type === 1" :hidden="!data.online">
                                     <my-sql-icon />
@@ -198,6 +198,7 @@ import { connect, disconnect } from "@/api/MySqlApi";
 
 // 引入状态管理
 import useInstanceStore from '@/store/InstanceStore';
+import useTabStore from "@/store/TabStore";
 
 export default defineComponent({
     name: 'DatabasePanel',
@@ -335,6 +336,15 @@ export default defineComponent({
             this.showContext = true;
             this.top = event.clientY;
             this.left = event.clientX;
+        },
+        nodeDbClick(data: DatabaseTreeItem) {
+            this.treeCurrent = data;
+            // 表被点击
+            useTabStore().add(data.type, {
+                instance: this.getInstance().data as Instance,
+                table: data.name,
+                name: data.name
+            });
         },
         // <-------------------------- 树形节点事件 --------------------------<
 
@@ -551,6 +561,8 @@ export default defineComponent({
     }
 
     .rain-tree-node {
+        user-select: none;
+
         .rain-tree-node-title {
             margin-left: 5px;
         }

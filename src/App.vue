@@ -94,7 +94,9 @@
     <!-- 容器 -->
     <div id="container">
         <!-- 主视图 -->
-        <div id="main"></div>
+        <div id="main">
+            <main-container />
+        </div>
         <!-- 页低面板 -->
         <div id="footer"></div>
     </div>
@@ -104,7 +106,6 @@
 
 <script lang='ts'>
 import { defineComponent } from 'vue'
-
 import { Close, Minus, FullScreen } from '@element-plus/icons-vue';
 
 // api
@@ -123,6 +124,9 @@ import RainMenuItem from '@/components/RainMenu/Item.vue';
 
 // 模块
 import DatabasePanel from '@/module/DatabasePanel/index.vue';
+import MainContainer from '@/module/MainContainer/index.vue';
+
+// 插件
 import emitter from '@/plugins/mitt';
 import MessageEventEnum from '@/enumeration/MessageEventEnum';
 
@@ -130,7 +134,7 @@ import MessageEventEnum from '@/enumeration/MessageEventEnum';
 export default defineComponent({
     components: {
         Close, Minus, FullScreen, DatabaseVue, FileSql, Record, Logo,
-        RainMenu, RainMenuItem, DatabasePanel
+        RainMenu, RainMenuItem, DatabasePanel, MainContainer
     },
     data: () => {
         return {

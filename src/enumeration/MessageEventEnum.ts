@@ -13,7 +13,12 @@ enum MessageEventEnum {
     /**
      * 应用 - 实例状态
      */
-    APPLICATION_INSTANCE_STATUS = "application:instance:status"
+    APPLICATION_INSTANCE_STATUS = "application:instance:status",
+
+    /**
+     * 标签增加
+     */
+    TAB_ADD = "tab:add"
 
 }
 
