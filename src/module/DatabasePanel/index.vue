@@ -195,12 +195,13 @@ import { databaseService, instanceService } from '@/global/BeanFactory';
 import { ElLoading, ElMessage, ElMessageBox } from 'element-plus';
 import emitter from '@/plugins/mitt';
 import Database from "@/entity/Database";
-import { connect, disconnect } from "@/api/MySqlApi";
+import MySqlApi from "@/api/MySqlApi";
 
 // 引入状态管理
 import useInstanceStore from '@/store/InstanceStore';
 import useTabStore from "@/store/TabStore";
 import Table from "@/entity/Table";
+import Field from "@/entity/Field";
 
 export default defineComponent({
     name: 'DatabasePanel',
@@ -374,6 +375,11 @@ export default defineComponent({
                 // 双击表，
                 let instance = this.getInstance().data as Instance;
                 let database = this.getDatabase()!.data as Database;
+                let fieldTemp = data.children.filter(e => e.name === '列');
+                let fields = new Array<Field>();
+                if (fieldTemp.length > 0) {
+                    fields = data.children.filter(e => e.name === '列')[0].children.map(e => e.data as Field);
+                }
                 useTabStore().add({
                     id: new Date().getTime(),
                     name: `${data.name}[${instance.name}]`,
@@ -381,7 +387,8 @@ export default defineComponent({
                     param: {
                         instance,
                         database,
-                        table: data.data as Table
+                        table: data.data as Table,
+                        fields: fields
                     }
                 });
             }
@@ -458,7 +465,7 @@ export default defineComponent({
                 return;
             }
             let instance = this.treeCurrent.data as Instance
-            connect({
+            MySqlApi.connect({
                 id: instance.id!,
                 user: instance.username,
                 password: instance.password,
@@ -490,7 +497,7 @@ export default defineComponent({
                 return;
             }
             let instance = this.treeCurrent.data as Instance
-            disconnect({
+            MySqlApi.disconnect({
                 id: instance.id!
             }).then(() => {
                 // 断开连接，刷新状态

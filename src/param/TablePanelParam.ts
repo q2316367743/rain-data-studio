@@ -1,4 +1,5 @@
 import Database from "@/entity/Database";
+import Field from "@/entity/Field";
 import Instance from "@/entity/Instance";
 import Table from "@/entity/Table";
 
@@ -19,5 +20,9 @@ export default interface TablePanelParam {
      */
     table: Table;
 
+    /**
+     * 字段
+     */
+    fields: Array<Field>;
 
 }

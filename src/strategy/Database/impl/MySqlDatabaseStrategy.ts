@@ -1,7 +1,7 @@
 import Instance from "@/entity/Instance";
 import DatabaseStrategy from "../DatabaseStrategy";
 
-import { connect, query } from '@/api/MySqlApi'
+import MySqlApi from '@/api/MySqlApi'
 import { ElLoading } from "element-plus";
 import { databaseService, fieldService, tableService } from "@/global/BeanFactory";
 
@@ -15,20 +15,21 @@ export default class MySqlDatabaseStrategy implements DatabaseStrategy {
         });
         try {
             // 创建链接
-            await connect({
+            let options = {
                 id: instance.id!,
                 user: instance.username,
                 password: instance.password,
                 host: instance.host,
                 port: instance.port,
                 database: instance.database
-            });
+            };
+            await MySqlApi.connect(options);
             // 查询全部数据库
             loading.setText('查询全部数据库')
-            let result = await query({
+            let result = await MySqlApi.query({
                 id: instance.id!,
                 sql: 'show databases;'
-            });
+            }, options);
             // 根据数据库，查询全部的表
             let databases = result[0] as Array<any>;
             for (let database of databases) {
@@ -43,10 +44,10 @@ export default class MySqlDatabaseStrategy implements DatabaseStrategy {
                     createTime: new Date(),
                 });
                 // 查询表的结果
-                let tableResult = await query({
+                let tableResult = await MySqlApi.query({
                     id: instance.id!,
                     sql: `select table_name from information_schema.tables where table_schema='${databaseName}';`
-                });
+                }, options);
                 let tables = tableResult[0] as Array<any>;
                 for (let table of tables) {
                     let tableName = table['table_name'];
@@ -56,10 +57,10 @@ export default class MySqlDatabaseStrategy implements DatabaseStrategy {
                         instanceId: instance.id!,
                         name: tableName
                     });
-                    let fieldResult = await query({
+                    let fieldResult = await MySqlApi.query({
                         id: instance.id!,
                         sql: `SHOW FULL COLUMNS FROM ${databaseName}.${tableName};`
-                    });
+                    }, options);
                     let fields = fieldResult[0] as Array<any>;
                     for (let field of fields) {
                         await fieldService.save({
