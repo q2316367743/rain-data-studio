@@ -4,7 +4,7 @@ const mysql = require('mysql2/promise');
 
 const schedule = require("node-schedule");
 
-const connectItems = [];
+let connectItems = [];
 
 module.exports = function registerApplication(mainWindow) {
     // 定时任务，每隔5秒钟，向渲染进程发送数据库连接情况
@@ -93,6 +93,21 @@ module.exports = function registerApplication(mainWindow) {
             code: false,
             message: '未找到链接，请连接数据库后重试'
         }
+    });
+
+    ipcMain.handle('mysql:disconnect', (event, args) => {
+        console.log('mysql:disconnect');
+        for (let item of connectItems) {
+            if (item.id = args.id) {
+                // 移除这个
+                connectItems = connectItems.filter(e => e.id !== args.id);
+                break;
+            }
+        }
+        return {
+            code: true,
+            message: '成功'
+        };
     })
 
 }

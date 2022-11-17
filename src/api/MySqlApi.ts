@@ -23,6 +23,11 @@ export async function query(options: MySqlExecuteOptions): Promise<any> {
     return Promise.resolve(result.data);
 }
 
+export async function disconnect(options: MySqlConnectionOptions): Promise<void> {
+    let result = await (ipcRenderer.invoke('mysql:disconnect', options) as Promise<Result<void>>);
+    return Promise.resolve();
+}
+
 // 接收主进程传递过来的消息
 ipcRenderer.on('mysql:status', (event: Event, args: Result<any>) => {
     if (args.code) {

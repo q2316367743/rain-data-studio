@@ -194,7 +194,7 @@ import { databaseService, instanceService } from '@/global/BeanFactory';
 import { ElLoading, ElMessage, ElMessageBox } from 'element-plus';
 import emitter from '@/plugins/mitt';
 import Database from "@/entity/Database";
-import { connect } from "@/api/MySqlApi";
+import { connect, disconnect } from "@/api/MySqlApi";
 
 // 引入状态管理
 import useInstanceStore from '@/store/InstanceStore';
@@ -417,7 +417,7 @@ export default defineComponent({
                 database: instance.database
             }).then(() => {
                 // 连接成功，刷新状态
-                console.log('连接成功，判断是否需要刷新，刷新状态');
+                console.log('连接成功，刷新状态');
                 useInstanceStore().setOnline(this.treeCurrent?.nodeKey!, true)
                 // 加入到在现实例中
             })
@@ -439,11 +439,20 @@ export default defineComponent({
                 });
                 return;
             }
-            ElMessage({
-                showClose: true,
-                type: "error",
-                message: '暂未实现'
-            });
+            let instance = this.treeCurrent.data as Instance
+            disconnect({
+                id: instance.id!
+            }).then(() => {
+                // 断开连接，刷新状态
+                console.log('断开连接，刷新状态');
+                useInstanceStore().setOnline(this.treeCurrent?.nodeKey!, false)
+            }).catch((e) => {
+                ElMessage({
+                    showClose: true,
+                    type: 'error',
+                    message: '断开失败，' + e
+                })
+            })
         }
         // <-------------------------- 菜单事件 --------------------------<
     }
