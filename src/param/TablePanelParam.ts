@@ -1,3 +1,4 @@
+import Database from "@/entity/Database";
 import Instance from "@/entity/Instance";
 import Table from "@/entity/Table";
 
@@ -9,13 +10,14 @@ export default interface TablePanelParam {
     instance: Instance;
 
     /**
-     * 表
+     * 数据库
      */
-    table: string;
+    database: Database;
 
     /**
      * 表
      */
-    name: string;
+    table: Table;
+
 
 }

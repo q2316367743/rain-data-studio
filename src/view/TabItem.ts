@@ -1,3 +1,4 @@
+import TabPanelComponentEnum from "@/enumeration/TabPanelComponentEnum";
 import TablePanelParam from "@/param/TablePanelParam";
 
 export default interface TableItem {
@@ -8,14 +9,14 @@ export default interface TableItem {
     id: number;
 
     /**
-     * 名字
+     * 名字，选项卡使用的名字
      */
     name: string;
 
     /**
      * 组件名称
      */
-    component: string;
+    component: TabPanelComponentEnum;
 
     /**
      * 参数

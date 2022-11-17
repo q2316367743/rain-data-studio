@@ -1,7 +1,7 @@
 <!-- 表 - 面板 -->
 <template>
     <div id="table-panel">
-        {{ param?.table }}[{{ param?.instance.name }}]
+        {{ param?.instance.name }} - {{ param?.database.name }} - {{ param?.table.name }}
     </div>
 </template>
 <script lang="ts">

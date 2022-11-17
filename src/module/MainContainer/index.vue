@@ -4,7 +4,7 @@
             <div class="main-container-title-item" v-for="item in stack" :key="'tab' + item.id"
                 :class="showTab === item.id ? 'active' : ''" @click="showTab = item.id">
                 <div>{{ item.name }}</div>
-                <el-icon :size="12">
+                <el-icon :size="12" @click.stop="remove(item.id)">
                     <Close />
                 </el-icon>
             </div>
@@ -17,7 +17,7 @@
 </template>
 <script lang="ts">
 import { defineComponent } from "vue";
-import { mapActions, mapState } from "pinia";
+import { mapState } from "pinia";
 import { Close } from "@element-plus/icons-vue";
 
 // 引入状态
@@ -42,6 +42,12 @@ export default defineComponent({
     data: () => ({
         showTab: 1
     }),
+    methods: {
+        remove(id: number) {
+            useTabStore().remove(id);
+            console.log(id, this.showTab)
+        }
+    }
 });
 </script>
 <style scoped lang="less">

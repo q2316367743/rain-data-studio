@@ -185,6 +185,7 @@ import RainContextMenuSub from "@/components/RainContextMenu/sub.vue";
 import InstanceTypeEnum from '@/enumeration/InstanceTypeEnum';
 import MessageEventEnum from '@/enumeration/MessageEventEnum';
 import DatabaseTreeItemType from "@/enumeration/DatabaseTreeItemType";
+import TabPanelComponentEnum from "@/enumeration/TabPanelComponentEnum";
 
 // 实体对象
 import Instance from '@/entity/Instance';
@@ -199,6 +200,7 @@ import { connect, disconnect } from "@/api/MySqlApi";
 // 引入状态管理
 import useInstanceStore from '@/store/InstanceStore';
 import useTabStore from "@/store/TabStore";
+import Table from "@/entity/Table";
 
 export default defineComponent({
     name: 'DatabasePanel',
@@ -267,6 +269,34 @@ export default defineComponent({
                 }
             }
             return instance
+        },
+        /**
+         * 获取当前点击的数据库
+         */
+        getDatabase(): DatabaseTreeItem | undefined {
+            let current = this.treeCurrent!
+            if (current.type === DatabaseTreeItemType.INSTANCE) {
+                return;
+            } else if (current.type === DatabaseTreeItemType.DATABASE) {
+                return current;
+            } else {
+                let nodeKey = this.treeCurrent!.nodeKey;
+                let tempNodeKey = this.treeCurrent!.nodeKey;
+                let instanceIndex = tempNodeKey.indexOf('-');
+                let instanceNodeKey = tempNodeKey.substring(0, nodeKey.indexOf('-'));
+                tempNodeKey = tempNodeKey.substring(instanceIndex + 1);
+                let databaseIndex = tempNodeKey.indexOf('-');
+                let databaseNodeKey = nodeKey.substring(0, databaseIndex + instanceIndex + 1);
+                for (let item of this.treeItems) {
+                    if (item.nodeKey === instanceNodeKey) {
+                        for (let child of item.children) {
+                            if (databaseNodeKey === child.nodeKey) {
+                                return child;
+                            }
+                        }
+                    }
+                }
+            }
         },
         refreshClick() {
             if (!this.treeCurrent) return;
@@ -339,12 +369,22 @@ export default defineComponent({
         },
         nodeDbClick(data: DatabaseTreeItem) {
             this.treeCurrent = data;
-            // 表被点击
-            useTabStore().add(data.type, {
-                instance: this.getInstance().data as Instance,
-                table: data.name,
-                name: data.name
-            });
+            // 不同类型的双击含义不同
+            if (data.type === DatabaseTreeItemType.TABLE) {
+                // 双击表，
+                let instance = this.getInstance().data as Instance;
+                let database = this.getDatabase()!.data as Database;
+                useTabStore().add({
+                    id: new Date().getTime(),
+                    name: `${data.name}[${instance.name}]`,
+                    component: TabPanelComponentEnum.TABLE_PANEL,
+                    param: {
+                        instance,
+                        database,
+                        table: data.data as Table
+                    }
+                });
+            }
         },
         // <-------------------------- 树形节点事件 --------------------------<
 
