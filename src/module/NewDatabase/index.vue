@@ -43,6 +43,7 @@ import { instanceService } from '@/global/BeanFactory';
 import databaseStrategyContext from '@/strategy/Database/DatabaseStrategyContext';
 import emitter from "@/plugins/mitt";
 import MessageEventEnum from "@/enumeration/MessageEventEnum";
+import useInstanceStore from "@/store/InstanceStore";
 
 export default defineComponent({
     name: 'NewDatabase',
@@ -89,7 +90,7 @@ export default defineComponent({
                         type: 'success',
                         message: '初始化成功'
                     });
-                    emitter.emit(MessageEventEnum.APPLICATION_INSTANCE_REFRESH)
+                    useInstanceStore().renderInstances()
                 }).catch((e: Error) => {
                     ElMessage({
                         showClose: true,

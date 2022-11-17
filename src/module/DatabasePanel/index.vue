@@ -157,6 +157,7 @@
 <script lang="ts">
 import DatabaseTreeItem from "@/view/DatabaseTreeItem";
 import { defineComponent } from "vue";
+import { mapState } from "pinia";
 
 import { Plus, Refresh, Search, InfoFilled } from "@element-plus/icons-vue";
 
@@ -190,11 +191,13 @@ import Instance from '@/entity/Instance';
 
 // 其他
 import { databaseService, instanceService } from '@/global/BeanFactory';
-import databaseStrategyContext from '@/strategy/Database/DatabaseStrategyContext';
 import { ElLoading, ElMessage, ElMessageBox } from 'element-plus';
 import emitter from '@/plugins/mitt';
 import Database from "@/entity/Database";
 import { connect } from "@/api/MySqlApi";
+
+// 引入状态管理
+import useInstanceStore from '@/store/InstanceStore';
 
 export default defineComponent({
     name: 'DatabasePanel',
@@ -214,9 +217,6 @@ export default defineComponent({
         },
         treeFilterText: '',
         treeCurrent: undefined as DatabaseTreeItem | undefined,
-        treeItems: [] as Array<DatabaseTreeItem>,
-        treeNodeKeys: [] as Array<string>,
-        onlineNodeKeys: new Set<string>(),
 
         defaultExpandedKeys: [] as Array<string>,
         newDatabaseDialog: false,
@@ -234,32 +234,20 @@ export default defineComponent({
         left: 0,
     }),
     created() {
-        this.refresh();
+        useInstanceStore().renderInstances();
         emitter.on(MessageEventEnum.APPLICATION_INSTANCE_ADD, () => {
             this.newDatabaseDialog = true;
         });
-        emitter.on(MessageEventEnum.APPLICATION_INSTANCE_REFRESH, () => {
-            this.refresh()
-        });
-        emitter.on(MessageEventEnum.APPLICATION_INSTANCE_STATUS, (connectIds: any) => {
-            console.log(connectIds)
-        })
     },
     watch: {
         treeFilterText(newValue: string) {
             (this.$refs['treeRef'] as any).filter(newValue)
         }
     },
+    computed: {
+        ...mapState(useInstanceStore, ['treeItems'])
+    },
     methods: {
-        refresh() {
-            this.loading = true;
-            console.log('重新渲染')
-            databaseTreeBuild().then((tree) => {
-                this.treeItems = tree[0];
-                this.treeNodeKeys = tree[1]
-                this.loading = false;
-            });
-        },
 
         // >-------------------------- 上方按钮 -------------------------->
         /**
@@ -315,7 +303,7 @@ export default defineComponent({
                         type: 'success',
                         message: '操作成功'
                     })
-                    this.refresh()
+                    useInstanceStore().renderInstances()
                 }).catch(e => {
                     ElMessage({
                         showClose: true,
@@ -388,7 +376,7 @@ export default defineComponent({
                                 type: "success",
                                 message: '删除成功'
                             });
-                            this.refresh()
+                            useInstanceStore().renderInstances()
                         }).catch((e) => {
                             ElMessage({
                                 showClose: true,
@@ -403,7 +391,6 @@ export default defineComponent({
                 })
         },
         connectInstance() {
-            console.log(this.treeCurrent)
             if (!this.treeCurrent) {
                 ElMessage({
                     showClose: true,
@@ -421,10 +408,6 @@ export default defineComponent({
                 return;
             }
             let instance = this.treeCurrent.data as Instance
-            if (this.onlineNodeKeys.has(this.treeCurrent?.nodeKey!)) {
-                // 存在跳过
-                return;
-            }
             connect({
                 id: instance.id!,
                 user: instance.username,
@@ -434,7 +417,9 @@ export default defineComponent({
                 database: instance.database
             }).then(() => {
                 // 连接成功，刷新状态
-                console.log('连接成功，判断是否需要刷新，刷新状态')
+                console.log('连接成功，判断是否需要刷新，刷新状态');
+                useInstanceStore().setOnline(this.treeCurrent?.nodeKey!, true)
+                // 加入到在现实例中
             })
         },
         stopInstance() {

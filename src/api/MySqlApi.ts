@@ -1,6 +1,7 @@
 import MessageEventEnum from "@/enumeration/MessageEventEnum";
 import Result from "@/global/Result";
 import emitter from "@/plugins/mitt";
+import useInstanceStore from "@/store/InstanceStore";
 import { resolve } from "path";
 import { MySqlConnectionOptions } from "./entity/MySqlConnectionOptions";
 import MySqlExecuteOptions from "./entity/MySqlExecuteOptions";
@@ -25,6 +26,8 @@ export async function query(options: MySqlExecuteOptions): Promise<any> {
 // 接收主进程传递过来的消息
 ipcRenderer.on('mysql:status', (event: Event, args: Result<any>) => {
     if (args.code) {
-        emitter.emit(MessageEventEnum.APPLICATION_INSTANCE_STATUS, args.data.connectIds);
+        for (let nodeKey of args.data.connectIds) {
+            useInstanceStore().setOnline(nodeKey, true);
+        }
     }
 })
