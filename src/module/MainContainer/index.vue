@@ -1,13 +1,17 @@
 <template>
     <div id="main-container">
         <div class="main-container-title">
-            <div class="main-container-title-item" v-for="item in stack" :key="'tab' + item.id"
-                :class="showTab === item.id ? 'active' : ''" @click="showTab = item.id">
-                <div>{{ item.name }}</div>
-                <el-icon :size="12" @click.stop="remove(item.id)">
-                    <Close />
-                </el-icon>
-            </div>
+            <el-scrollbar>
+                <div class="main-container-title-scrollbar">
+                    <div class="main-container-title-item" v-for="item in stack" :key="'tab' + item.id"
+                        :class="showTab === item.id ? 'active' : ''" @click="showTab = item.id">
+                        <div>{{ item.name }}</div>
+                        <el-icon :size="12" @click.stop="remove(item.id)">
+                            <Close />
+                        </el-icon>
+                    </div>
+                </div>
+            </el-scrollbar>
         </div>
         <div class="main-container-body">
             <component v-for="item in stack" :key="item.id" :is="item.component" :param="item.param"
@@ -68,13 +72,19 @@ export default defineComponent({
     display: flex;
     line-height: 30px;
     background-color: #323130;
+    overflow-y: auto;
+
+    .main-container-title-scrollbar {
+        display: flex;
+    }
 
     .main-container-title-item {
         display: flex;
         border-right: var(--border-color);
-        padding: 0 5px;
+        padding: 0 5px 0 10px;
         font-size: 13px;
         cursor: pointer;
+        user-select: none;
 
         &.active {
             background-color: var(--background-color-main);
