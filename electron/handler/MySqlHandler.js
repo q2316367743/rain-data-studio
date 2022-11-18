@@ -12,7 +12,7 @@ async function connect(args) {
 
         // 连接前，先判断ID是否存在
         for (let item of connectItems) {
-            if (item.id === id) {
+            if (item.id == id) {
                 // 找到ID，直接返回成功
                 return {
                     code: true,

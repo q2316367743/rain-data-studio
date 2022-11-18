@@ -4,6 +4,9 @@ import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
 import { createPinia } from 'pinia';
 
+import VXETable from 'vxe-table'
+import 'vxe-table/lib/style.css'
+
 import i18n from '@/i18n';
 
 import '@/main.less';
@@ -34,9 +37,9 @@ self.MonacoEnvironment = {
     }
 }
 
-
 createApp(App)
     .use(ElementPlus)
     .use(createPinia())
     .use(i18n)
+    .use(VXETable)
     .mount('#app')

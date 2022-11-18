@@ -2,11 +2,12 @@
 <template>
     <div id="table-panel">
         <div class="table-panel-option">
-            {{count}}
+            {{ count }}
         </div>
         <div class="table-panel-condition">
-            <div class="table-panel-condition-where">
-                WHERE
+            <div class="table-panel-condition-where" :style="{ color: where.length > 0 ? '#ff91b2' : '' }">
+                <span class="tag">WHERE</span>
+                <el-input v-model="where" size="small"></el-input>
             </div>
             <div class="table-panel-condition-order">
                 ORDER BY
@@ -14,18 +15,19 @@
         </div>
         <div class="table-panel-body">
             <el-scrollbar>
-                <el-table :data="records" style="width: 100%">
-                    <el-table-column v-for="field in param?.fields" :prop="field.name" :label="field.name"
-                        min-width="80px" show-overflow-tooltip />
-                </el-table>
+                <vxe-table border :data="records" height="calc(100vh - 170px)">
+                    <vxe-column v-for="item of headers" :key="item.id" :field="item.field" :title="item.field"
+                        :width="item.minWidth" show-overflow="tooltip" sortable />
+                </vxe-table>
             </el-scrollbar>
         </div>
     </div>
 </template>
 <script lang="ts">
+import { defineComponent, PropType } from "vue";
+
 import MySqlApi from "@/api/MySqlApi";
 import TablePanelParam from "@/param/TablePanelParam";
-import { defineComponent, PropType } from "vue";
 
 
 export default defineComponent({
@@ -37,9 +39,19 @@ export default defineComponent({
         count: 0,
         where: '',
         orderBy: '',
-        records: [] as Array<any>
+        records: [] as Array<any>,
+        headers: [] as Array<any>,
     }),
     created() {
+        // 构建列定义
+        for (let field of this.param!.fields) {
+            this.headers.push({
+                id: field.id,
+                field: field.name,
+                minWidth: Math.max(field.name.length * 16, 40),
+                headerName: field.name
+            });
+        }
         this.query();
     },
     methods: {
@@ -104,6 +116,19 @@ export default defineComponent({
     border-bottom: 1px solid var(--border-color-main);
     display: flex;
     justify-content: space-between;
+
+
+    .table-panel-condition-where {
+        display: flex;
+
+        .tag {
+            line-height: 50px;
+            font-weight: bold;
+        }
+        .el-input {
+            margin: 13px 5px;
+        }
+    }
 }
 
 .table-panel-body {
@@ -112,6 +137,5 @@ export default defineComponent({
     left: 0;
     right: 0;
     bottom: 0;
-    overflow: auto;
 }
 </style>
