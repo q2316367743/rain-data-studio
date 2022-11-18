@@ -7,27 +7,29 @@
         <div class="table-panel-condition">
             <div class="table-panel-condition-where" :style="{ color: where.length > 0 ? '#ff91b2' : '' }">
                 <span class="tag">WHERE</span>
-                <el-input v-model="where" size="small"></el-input>
+                <el-input v-model="where" size="small" @keyup.enter="query"></el-input>
             </div>
             <div class="table-panel-condition-order">
                 ORDER BY
             </div>
         </div>
         <div class="table-panel-body">
-            <el-scrollbar>
-                <vxe-table border :data="records" height="calc(100vh - 170px)">
-                    <vxe-column v-for="item of headers" :key="item.id" :field="item.field" :title="item.field"
-                        :width="item.minWidth" show-overflow="tooltip" sortable />
-                </vxe-table>
-            </el-scrollbar>
+            <vxe-table border :data="records" height="100%" class="rain-scrollbar">
+                <vxe-column v-for="header of headers" :key="header.id" :field="header.field" :title="header.field"
+                    :width="header.minWidth" :title-help="header.help" show-overflow="tooltip" sortable
+                    :formatter="format" />
+            </vxe-table>
         </div>
     </div>
 </template>
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
+import { VxeTablePropTypes, VxeColumnPropTypes, VxeTableDefines } from 'vxe-table'
+import XEUtils from 'xe-utils'
 
 import MySqlApi from "@/api/MySqlApi";
 import TablePanelParam from "@/param/TablePanelParam";
+import { ElMessage } from "element-plus";
 
 
 export default defineComponent({
@@ -41,6 +43,13 @@ export default defineComponent({
         orderBy: '',
         records: [] as Array<any>,
         headers: [] as Array<any>,
+        tableTooltipConfig: {
+            showAll: true,
+            enterable: true,
+            contentMethod: ({ type, column, row, items, _columnIndex }) => {
+                return column.title;
+            }
+        } as VxeTablePropTypes.TooltipConfig
     }),
     created() {
         // 构建列定义
@@ -48,8 +57,11 @@ export default defineComponent({
             this.headers.push({
                 id: field.id,
                 field: field.name,
-                minWidth: Math.max(field.name.length * 16, 40),
-                headerName: field.name
+                minWidth: Math.max(field.name.length * 10 + 70, 90),
+                headerName: field.name,
+                help: {
+                    message: `${field.name}：${field.type}\n${field.comment}`
+                }
             });
         }
         this.query();
@@ -71,21 +83,40 @@ export default defineComponent({
             if (this.orderBy !== '') {
                 sql = sql + ` ORDER BY ${this.orderBy}`
             }
-            sql = sql + ' LIMIT 500'
             MySqlApi.query({
                 id: this.param?.instance.id!,
-                sql: 'SELECT * ' + sql
+                sql: 'SELECT * ' + sql + ' LIMIT 500'
             }, options).then((result) => {
                 this.records = result[0];
                 console.log(result)
-            })
-            MySqlApi.query({
-                id: this.param?.instance.id!,
-                sql: 'SELECT COUNT(1) ' + sql
-            }, options).then((result) => {
-                this.count = result[0][0]['COUNT(1)']
-            })
+                // 查询完列表，再查询数量
+                MySqlApi.query({
+                    id: this.param?.instance.id!,
+                    sql: 'SELECT COUNT(1) ' + sql
+                }, options).then((result) => {
+                    this.count = result[0][0]['COUNT(1)']
+                }).catch(e => {
+                    ElMessage({
+                        showClose: true,
+                        type: 'error',
+                        message: '查询异常，' + e
+                    });
+                });
+            }).catch(e => {
+                ElMessage({
+                    showClose: true,
+                    type: 'error',
+                    message: '查询异常，' + e
+                });
+            });
+        },
+        format(column: { cellValue: any }): VxeColumnPropTypes.Formatter {
+            if (column.cellValue instanceof Date) {
+                return XEUtils.toDateString(column.cellValue, 'yyyy-MM-dd HH:ss:mm')
+            }
+            return column.cellValue;
         }
+
     }
 });
 </script>
@@ -104,6 +135,7 @@ export default defineComponent({
     left: 0;
     right: 0;
     height: 30px;
+    line-height: 30px;
     border-bottom: 1px solid var(--border-color-main);
 }
 
@@ -125,6 +157,7 @@ export default defineComponent({
             line-height: 50px;
             font-weight: bold;
         }
+
         .el-input {
             margin: 13px 5px;
         }
@@ -137,5 +170,37 @@ export default defineComponent({
     left: 0;
     right: 0;
     bottom: 0;
+}
+
+/*滚动条整体部分*/
+.rain-scrollbar ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+/*滚动条的轨道*/
+.rain-scrollbar ::-webkit-scrollbar-track {
+    background-color: #FFFFFF;
+}
+
+/*滚动条里面的小方块，能向上向下移动*/
+.rain-scrollbar ::-webkit-scrollbar-thumb {
+    background-color: #bfbfbf;
+    border-radius: 5px;
+    border: 1px solid #F1F1F1;
+    box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
+}
+
+.rain-scrollbar ::-webkit-scrollbar-thumb:hover {
+    background-color: #A8A8A8;
+}
+
+.rain-scrollbar ::-webkit-scrollbar-thumb:active {
+    background-color: #787878;
+}
+
+/*边角，即两个滚动条的交汇处*/
+.rain-scrollbar ::-webkit-scrollbar-corner {
+    background-color: #FFFFFF;
 }
 </style>

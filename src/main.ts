@@ -37,6 +37,12 @@ self.MonacoEnvironment = {
     }
 }
 
+VXETable.setup({
+    table: {
+        showOverflow: 'tooltip'
+    }
+})
+
 createApp(App)
     .use(ElementPlus)
     .use(createPinia())

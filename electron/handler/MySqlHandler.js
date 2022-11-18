@@ -42,19 +42,27 @@ async function connect(args) {
 }
 
 async function query(args) {
-    for (let connect of connectItems) {
-        if (connect.id = args.id) {
-            console.log(args.sql)
-            return {
-                code: true,
-                message: '成功',
-                data: await connect.connect.query(args.sql)
+    try {
+        for (let connect of connectItems) {
+            if (connect.id = args.id) {
+                console.log(args.sql)
+                return {
+                    code: true,
+                    message: '成功',
+                    data: await connect.connect.query(args.sql)
+                }
             }
         }
-    }
-    return {
-        code: false,
-        message: '未找到链接，请连接数据库后重试'
+        return {
+            code: false,
+            message: '未找到链接，请连接数据库后重试'
+        }
+    } catch (e) {
+        console.error(e)
+        return {
+            code: false,
+            message: e
+        }
     }
 }
 
@@ -111,10 +119,12 @@ module.exports = function registerApplication(mainWindow) {
                     code: false,
                     message: '链接失败'
                 }
+            }else {
+                return await query(args.options);
             }
         }
         console.log('mysql:query - 3');
-        return await query(args.options);
+        return result;
     });
 
     ipcMain.handle('mysql:disconnect', (event, args) => {

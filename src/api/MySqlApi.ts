@@ -25,15 +25,16 @@ export default {
 
     async execute(options: MySqlExecuteOptions): Promise<void> {
         let result = await (ipcRenderer.invoke('mysql:execute', options) as Promise<Result<string>>);
-        return Promise.resolve();
+        return result.code ? Promise.resolve() : Promise.reject(result.message);
     },
 
     async query(options: MySqlExecuteOptions, connect: MySqlConnectionOptions): Promise<any> {
+        console.log(options)
         let result = await (ipcRenderer.invoke('mysql:query', {
             options,
             connect
         }) as Promise<Result<any>>);
-        return Promise.resolve(result.data);
+        return result.code ? Promise.resolve(result.data) : Promise.reject(result.message);
     },
 
     async disconnect(options: MySqlConnectionOptions): Promise<void> {
